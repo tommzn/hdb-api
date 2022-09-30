@@ -7,7 +7,7 @@ External services can use this API to publish HomeDashboard data.
 ## Supported Datasources
 - IndoorClimate
 
-## API DEscription
+## API Ddscription
 ```swagger:
 openapi: 3.0.0
 info:
