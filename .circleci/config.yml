@@ -14,7 +14,6 @@ jobs:
           name: GHCR Login
           command: echo $CR_PAT | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
       - run:
-          working_directory: k8s
           name: Build Image
           command: |
             IMAGE_TAG="$(git tag -l v* --sort=authordate | tail  -n 1)"
