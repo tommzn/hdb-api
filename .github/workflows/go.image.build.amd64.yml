@@ -33,6 +33,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
+          context: .
           tags: |
             ghcr.io/${{ github.repository }}/amd64:${{ steps.release.outputs.tag }}
             ghcr.io/${{ github.repository }}/amd64:latest
