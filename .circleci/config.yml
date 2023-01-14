@@ -25,23 +25,38 @@ jobs:
       - run:
           name: GHCR Logout
           command: docker logout
+      
+  notify:
+    machine:
+      image: ubuntu-2004:202101-01
+    steps:
       - slack/notify:
           event: fail
           template: basic_fail_1
       - slack/notify:
           event: pass
           template: success_tagged_deploy_1
-  
+
 workflows:
   version: 2
   arm64-image-build:
     jobs:
       - github-build-and-push:
-          context: slack-secrets
+          context: github-env
           filters:
             tags:
               only: /^v[0-9]+(\.[0-9]+)*$/
             branches:
               ignore: /.*/
+      - notify: 
+          context: slack-env
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*$/
+            branches:
+              ignore: /.*/
+          requires:
+            - github-build-and-push
+          
           
       

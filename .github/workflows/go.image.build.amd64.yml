@@ -4,38 +4,8 @@ on:
   create:
     tags:
       - k8s/v*
-
 jobs:
-  go-build:
-    name: Go Binary & Image Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set version tag
-        id: release
-        run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\/}
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Get Go version
-        run: echo "goversion=`egrep -i '^go [1-2][.][0-9]+$' go.mod | sed 's/go //' | sed 's/$/.x/'`" >> $GITHUB_ENV
-      - name: Install Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ env.goversion }}
-      - name: Build Binary
-        run: CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -v -o build_artifact_bin
-      - name: Log in to GitHub Docker Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
-      - name: Build Image
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          context: .
-          tags: |
-            ghcr.io/${{ github.repository }}/amd64:${{ steps.release.outputs.tag }}
-            ghcr.io/${{ github.repository }}/amd64:latest
-  
-        
+  go-image-build:
+    uses:  tommzn/github-ci/.github/workflows/go.image.build.amd64.yml@v1.0.6
+    secrets:
+      cr-pat: ${{ secrets.CR_PAT }}
