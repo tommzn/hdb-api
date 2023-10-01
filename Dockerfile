@@ -33,4 +33,5 @@ WORKDIR /go
 COPY --from=builder /go/build/build_artifact_bin hdb-bin
 USER nonroot:nonroot
 
+EXPOSE 8080
 ENTRYPOINT ["/go/hdb-bin"]
