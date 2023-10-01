@@ -1,9 +1,0 @@
-name: Go Package Release
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  go-image-build:
-    uses:  tommzn/github-ci/.github/workflows/go.pkg.auto-ci.yml@v1.0.5
