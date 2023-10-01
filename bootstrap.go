@@ -7,9 +7,9 @@ import (
 	log "github.com/tommzn/go-log"
 	secrets "github.com/tommzn/go-secrets"
 	core "github.com/tommzn/hdb-core"
-	datasourcecore "github.com/tommzn/hdb-datasource-core"
 )
 
+// Bootstrap creates a new HTTP server.
 func bootstrap(conf config.Config, ctx context.Context) (*core.Minion, error) {
 
 	secretsManager := newSecretsManager()
@@ -17,8 +17,8 @@ func bootstrap(conf config.Config, ctx context.Context) (*core.Minion, error) {
 		conf = loadConfig()
 	}
 	logger := newLogger(conf, secretsManager, ctx)
-	publisher := datasourcecore.NewPublisher(conf, logger)
-	server := newServer(conf, logger, publisher)
+	handlerList := requestHandlers(logger)
+	server := newServer(conf, logger, handlerList)
 	return core.NewMinion(server), nil
 }
 
@@ -49,4 +49,12 @@ func newLogger(conf config.Config, secretsMenager secrets.SecretsManager, ctx co
 	logger := log.NewLoggerFromConfig(conf, secretsMenager)
 	logger = log.WithNameSpace(logger, "hdb-api")
 	return log.WithK8sContext(logger)
+}
+
+// RequestHandlers returns all active request hadnlers.
+func requestHandlers(logger log.Logger) []RequestHandler {
+	return []RequestHandler{
+		&IndoorClimateRequestHandler{logger: logger},
+		&HealthRequestHandler{},
+	}
 }

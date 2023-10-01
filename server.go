@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"sync"
 	"time"
@@ -11,18 +10,16 @@ import (
 
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
-	core "github.com/tommzn/hdb-datasource-core"
-	events "github.com/tommzn/hdb-events-go"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func newServer(conf config.Config, logger log.Logger, messagePublisher core.Publisher) *webServer {
+// NewServer returns a new HTTP server.
+func newServer(conf config.Config, logger log.Logger, handlerList []RequestHandler) *webServer {
 	port := conf.Get("hdb.api.port", config.AsStringPtr("8080"))
 	return &webServer{
-		port:             *port,
-		conf:             conf,
-		logger:           logger,
-		messagePublisher: messagePublisher,
+		port:        *port,
+		conf:        conf,
+		logger:      logger,
+		handlerList: handlerList,
 	}
 }
 
@@ -35,8 +32,9 @@ func (server *webServer) Run(ctx context.Context, waitGroup *sync.WaitGroup) err
 	router := mux.NewRouter()
 	router.Use(server.logMiddleware)
 
-	router.HandleFunc("/api/v1/indoorclimate", server.indoorClimatePostNodeRequest).Methods("POST")
-	router.HandleFunc("/health", server.handleHealthCheckRequest).Methods("GET")
+	for _, handler := range server.handlerList {
+		handler.applyRoutes(router)
+	}
 
 	server.logger.Infof("Listen [%s]", server.port)
 	server.logger.Flush()
@@ -72,69 +70,4 @@ func (server *webServer) logMiddleware(next http.Handler) http.Handler {
 		server.logger.Debugf("Method: %s, URL: %+v, Header: %+v, URI: %s", r.Method, r.URL, r.Header, r.RequestURI)
 		next.ServeHTTP(w, r)
 	})
-}
-
-// HandleHealthCheckRequest always returns a 204 status code.
-func (server *webServer) handleHealthCheckRequest(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNoContent)
-}
-
-// IndoorClimatePostNodeRequest will publish given indoor climate data.
-func (server *webServer) indoorClimatePostNodeRequest(w http.ResponseWriter, r *http.Request) {
-
-	defer server.logger.Flush()
-
-	var inddorClimateData InddorClimateData
-	if err := json.NewDecoder(r.Body).Decode(&inddorClimateData); err != nil {
-		server.logger.Errorf("Unable to parse request, reason: %s", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	event, err := toIndoorCliemateDataEvent(inddorClimateData)
-	if err != nil {
-		server.logger.Errorf("Unable to convert to indoorclimate event, reason: %s", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	err = server.messagePublisher.Send(event)
-	if err != nil {
-		server.logger.Errorf("Unable to publish event, reason: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func toIndoorCliemateDataEvent(inddorClimateData InddorClimateData) (*events.IndoorClimate, error) {
-
-	var timestamp time.Time
-	if inddorClimateData.Timestamp != nil {
-		parsedTime, err := time.Parse(time.RFC3339, *inddorClimateData.Timestamp)
-		if err != nil {
-			return nil, err
-		}
-		timestamp = parsedTime
-	} else {
-		timestamp = time.Now()
-	}
-
-	return &events.IndoorClimate{
-		DeviceId:  inddorClimateData.DeviceId,
-		Timestamp: timestamppb.New(timestamp),
-		Type:      toMeasurementType(inddorClimateData.MeasurementType),
-		Value:     inddorClimateData.Value,
-	}, nil
-}
-
-func toMeasurementType(measurementType string) events.MeasurementType {
-	switch measurementType {
-	case "humidity":
-		return events.MeasurementType_HUMIDITY
-	case "battery":
-		return events.MeasurementType_BATTERY
-	default:
-		return events.MeasurementType_TEMPERATURE
-	}
 }

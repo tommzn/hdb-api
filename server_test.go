@@ -1,16 +1,15 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"github.com/stretchr/testify/suite"
-	config "github.com/tommzn/go-config"
-	log "github.com/tommzn/go-log"
 	"net/http"
-	"os"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/suite"
+	config "github.com/tommzn/go-config"
+	log "github.com/tommzn/go-log"
 )
 
 type ServerTestSuite struct {
@@ -20,7 +19,6 @@ type ServerTestSuite struct {
 	ctx        context.Context
 	cancelFunc context.CancelFunc
 	wg         *sync.WaitGroup
-	mock       *publisherMock
 }
 
 func TestServerTestSuite(t *testing.T) {
@@ -30,7 +28,6 @@ func TestServerTestSuite(t *testing.T) {
 func (suite *ServerTestSuite) SetupSuite() {
 	suite.conf = loadConfigForTest(nil)
 	suite.logger = loggerForTest()
-	suite.mock = newPublisherMock()
 }
 
 func (suite *ServerTestSuite) SetupTest() {
@@ -55,15 +52,11 @@ func (suite *ServerTestSuite) TestPublishIndoorClimateData() {
 	server := suite.serverForTest()
 	suite.startServer(server)
 
-	indoorClimateDataContent, err := os.ReadFile("fixtures/indoorcliamtedata.json")
-	suite.Nil(err)
-
-	resp, err := http.Post("http://localhost:8080/api/v1/indoorclimate", "application/json", bytes.NewReader(indoorClimateDataContent))
+	resp, err := http.Get("http://localhost:8080/api/v1/indoorclimate")
 	suite.Nil(err)
 	suite.NotNil(resp)
 	suite.Equal(http.StatusNoContent, resp.StatusCode)
 
-	suite.Equal(2, suite.mock.messageCount)
 	suite.stopServer()
 }
 
@@ -77,7 +70,11 @@ func (suite *ServerTestSuite) startServer(server *webServer) {
 }
 
 func (suite *ServerTestSuite) serverForTest() *webServer {
-	return newServer(suite.conf, suite.logger, suite.mock)
+	handlerList := []RequestHandler{
+		&IndoorClimateRequestHandler{logger: loggerForTest()},
+		&HealthRequestHandler{},
+	}
+	return newServer(suite.conf, suite.logger, handlerList)
 }
 
 func (suite *ServerTestSuite) stopServer() {

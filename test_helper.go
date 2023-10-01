@@ -25,3 +25,7 @@ func loggerForTest() log.Logger {
 func logValue(v interface{}) {
 	fmt.Println(v)
 }
+
+func indoorClimateRequestHandlerForTest() *IndoorClimateRequestHandler {
+	return &IndoorClimateRequestHandler{logger: loggerForTest()}
+}
