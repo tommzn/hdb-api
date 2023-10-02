@@ -1,0 +1,9 @@
+name: Go Tests
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  go-tests:
+    uses:  tommzn/github-ci/.github/workflows/go.test.yml@v1.0.55
