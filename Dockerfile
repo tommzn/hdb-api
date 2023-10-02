@@ -26,7 +26,7 @@ RUN CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
 
 FROM --platform=${BUILDPLATFORM:-linux/amd64} gcr.io/distroless/static:nonroot
 
-LABEL org.opencontainers.image.source=https://github.com/inlets/inlets-operator
+LABEL org.opencontainers.image.source=https://github.com/tommzn/hdb-api
 
 WORKDIR /go
 
