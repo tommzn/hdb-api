@@ -1,0 +1,11 @@
+
+log:
+  type: local
+  loglevel: debug
+
+hdb:
+  locations:
+    - id: "device01"
+      location: "location1"
+    - location: "location2"
+    - id: "device02"

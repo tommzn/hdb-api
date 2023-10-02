@@ -33,6 +33,8 @@ func (server *webServer) Run(ctx context.Context, waitGroup *sync.WaitGroup) err
 	router.Use(server.logMiddleware)
 
 	for _, handler := range server.handlerList {
+		waitGroup.Add(1)
+		handler.bootstrap(ctx, waitGroup)
 		handler.applyRoutes(router)
 	}
 
@@ -59,9 +61,7 @@ func (server *webServer) stopHttpServer() {
 	server.logger.Info("Stopping HTTP server.")
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	if err := server.httpServer.Shutdown(ctx); err != nil {
-		server.logger.Error("Unable to stop HTTP server, reason: ", err)
-	}
+	server.httpServer.Shutdown(ctx)
 }
 
 // LogMiddleware adds a logger for all requests. Used log level if debug.

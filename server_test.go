@@ -47,7 +47,7 @@ func (suite *ServerTestSuite) TestHealthRequest() {
 	suite.stopServer()
 }
 
-func (suite *ServerTestSuite) TestPublishIndoorClimateData() {
+func (suite *ServerTestSuite) TestGetIndoorClimateData() {
 
 	server := suite.serverForTest()
 	suite.startServer(server)
@@ -55,7 +55,7 @@ func (suite *ServerTestSuite) TestPublishIndoorClimateData() {
 	resp, err := http.Get("http://localhost:8080/api/v1/indoorclimate")
 	suite.Nil(err)
 	suite.NotNil(resp)
-	suite.Equal(http.StatusNoContent, resp.StatusCode)
+	suite.Equal(http.StatusOK, resp.StatusCode)
 
 	suite.stopServer()
 }
@@ -66,12 +66,12 @@ func (suite *ServerTestSuite) startServer(server *webServer) {
 		suite.wg.Add(1)
 		suite.Nil(server.Run(suite.ctx, suite.wg))
 	}()
-	time.Sleep(1 * time.Second)
+	time.Sleep(2 * time.Second)
 }
 
 func (suite *ServerTestSuite) serverForTest() *webServer {
 	handlerList := []RequestHandler{
-		&IndoorClimateRequestHandler{logger: loggerForTest()},
+		indoorClimateRequestHandlerForTest(),
 		&HealthRequestHandler{},
 	}
 	return newServer(suite.conf, suite.logger, handlerList)
@@ -86,6 +86,7 @@ func (suite *ServerTestSuite) stopServer() {
 	}()
 
 	suite.cancelFunc()
+	time.Sleep(1 * time.Second)
 	select {
 	case <-time.After(1 * time.Second):
 		suite.T().Error("Server stop timeput!")

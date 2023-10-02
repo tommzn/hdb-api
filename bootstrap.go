@@ -7,6 +7,7 @@ import (
 	log "github.com/tommzn/go-log"
 	secrets "github.com/tommzn/go-secrets"
 	core "github.com/tommzn/hdb-core"
+	datasource "github.com/tommzn/hdb-message-client"
 )
 
 // Bootstrap creates a new HTTP server.
@@ -17,7 +18,7 @@ func bootstrap(conf config.Config, ctx context.Context) (*core.Minion, error) {
 		conf = loadConfig()
 	}
 	logger := newLogger(conf, secretsManager, ctx)
-	handlerList := requestHandlers(logger)
+	handlerList := requestHandlers(conf, logger)
 	server := newServer(conf, logger, handlerList)
 	return core.NewMinion(server), nil
 }
@@ -52,9 +53,30 @@ func newLogger(conf config.Config, secretsMenager secrets.SecretsManager, ctx co
 }
 
 // RequestHandlers returns all active request hadnlers.
-func requestHandlers(logger log.Logger) []RequestHandler {
+func requestHandlers(conf config.Config, logger log.Logger) []RequestHandler {
 	return []RequestHandler{
-		&IndoorClimateRequestHandler{logger: logger},
+		&IndoorClimateRequestHandler{
+			logger:      logger,
+			climateData: make(map[string]ClimateData),
+			locations:   locationsFromConfig(conf, "hdb.locations"),
+			datasource:  datasource.New(conf, logger),
+		},
 		&HealthRequestHandler{},
 	}
+}
+
+// locationsFromConfig will try to extract a device id to location map from passed config.
+func locationsFromConfig(conf config.Config, configKey string) map[string]string {
+
+	locations := make(map[string]string)
+	configList := conf.GetAsSliceOfMaps(configKey)
+	for _, locationCfg := range configList {
+		if deviceId, ok := locationCfg["id"]; ok {
+			if location, ok1 := locationCfg["location"]; ok1 {
+				locations[deviceId] = location
+			}
+
+		}
+	}
+	return locations
 }
