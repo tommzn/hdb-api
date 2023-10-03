@@ -8,7 +8,7 @@ ARG TARGETARCH
 ARG Version
 ARG GitCommit
 
-ENV CGO_ENABLED=0
+ENV CGO_ENABLED=1
 ENV GO111MODULE=on
 
 RUN apk add build-base librdkafka-dev pkgconf
@@ -25,7 +25,7 @@ COPY .  .
 
 RUN CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
   go build -ldflags "-s -w -X github.com/inlets/inlets-operator/pkg/version.Release=${Version} -X github.com/inlets/inlets-operator/pkg/version.SHA=${GitCommit}" \
-  -a -tags dynamic -o build_artifact_bin .
+  -a -installsuffix cgo -o build_artifact_bin .
 
 FROM --platform=${BUILDPLATFORM:-linux/amd64} gcr.io/distroless/static:nonroot
 
