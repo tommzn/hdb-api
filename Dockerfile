@@ -11,7 +11,7 @@ ARG GitCommit
 ENV CGO_ENABLED=1
 ENV GO111MODULE=on
 
-RUN apk add build-base librdkafka-dev pkgconf
+RUN apk add build-base librdkafka-dev pkgconf gcc-aarch64-linux-gnu libc6-dev-arm64-cross
 
 WORKDIR /go/build
 
@@ -22,6 +22,9 @@ RUN go mod download
 
 
 COPY .  .
+
+RUN echo "$TARGETARCH"
+RUN if [ "$TARGETARCH" = "arm64" ]; then export CC=libc6-dev-arm64-cross; fi 
 
 RUN CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
   go test -v ./...
