@@ -31,8 +31,6 @@ FROM --platform=${BUILDPLATFORM:-linux/amd64} gcr.io/distroless/static:nonroot
 
 LABEL org.opencontainers.image.source=https://github.com/tommzn/hdb-api
 
-RUN apk add build-base librdkafka-dev pkgconf
-
 WORKDIR /go
 
 COPY --from=builder /go/build/build_artifact_bin hdb-bin
