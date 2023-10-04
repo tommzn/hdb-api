@@ -5,9 +5,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	core "github.com/tommzn/hdb-core"
 	events "github.com/tommzn/hdb-events-go"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

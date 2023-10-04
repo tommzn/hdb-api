@@ -4,9 +4,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
 	core "github.com/tommzn/hdb-core"
+	"google.golang.org/protobuf/proto"
 )
 
 // RequestHandler is a generic interface for each kind of requests.

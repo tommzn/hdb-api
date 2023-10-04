@@ -3,10 +3,10 @@ package main
 import (
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
 	events "github.com/tommzn/hdb-events-go"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

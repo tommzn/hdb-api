@@ -5,9 +5,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
+	"google.golang.org/protobuf/proto"
 )
 
 // WebServer to handleAPI requests.
