@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM:-linux/amd64} golang:1.19 as builder
+FROM --platform=linux/${TARGETARCH:-amd64} golang:1.19-alpine as builder
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -10,21 +10,21 @@ ARG GitCommit
 
 ENV CGO_ENABLED=1
 ENV GO111MODULE=on
+ENV GOOS=${TARGETOS}
+ENV GOARCH=${TARGETARCH}
 
 WORKDIR /go/build
 
-# Cache the download before continuing
 COPY go.mod go.mod
 COPY go.sum go.sum
 RUN go mod download
 
+RUN apk -U add ca-certificates
+RUN apk update && apk upgrade && apk add pkgconf git bash build-base sudo gcc musl-dev
+
 COPY .  .
 
-RUN CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
-  go test -v ./...
-
-RUN CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
-  go build -v -o build_artifact_bin
+RUN go build -tags musl -ldflags '-extldflags "-static"' -o build_artifact_bin
 
 FROM --platform=${BUILDPLATFORM:-linux/amd64} gcr.io/distroless/static:nonroot
 
