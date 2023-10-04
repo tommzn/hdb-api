@@ -5,9 +5,6 @@ ARG BUILDPLATFORM
 ARG TARGETOS
 ARG TARGETARCH
 
-ARG Version
-ARG GitCommit
-
 ENV CGO_ENABLED=1
 ENV GO111MODULE=on
 ENV GOOS=${TARGETOS}
@@ -35,5 +32,5 @@ WORKDIR /go
 COPY --from=builder /go/build/build_artifact_bin hdb-bin
 USER nonroot:nonroot
 
-EXPOSE 8080
+EXPOSE 80
 ENTRYPOINT ["/go/hdb-bin"]
