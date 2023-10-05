@@ -24,7 +24,7 @@ COPY .  .
 RUN go build -tags musl -ldflags '-extldflags "-static"' -o build_artifact_bin
 
 #FROM --platform=${BUILDPLATFORM:-linux/amd64} gcr.io/distroless/static:nonroot
-FROM --platform=${BUILDPLATFORM:-linux/amd64} alpine:latest
+FROM --platform=linux/${TARGETARCH:-amd64} alpine:latest
 
 
 LABEL org.opencontainers.image.source=https://github.com/tommzn/hdb-api
