@@ -39,7 +39,7 @@ func (suite *ServerTestSuite) TestHealthRequest() {
 	server := suite.serverForTest()
 	suite.startServer(server)
 
-	resp, err := http.Get("http://localhost/v1/health")
+	resp, err := http.Get("http://localhost:8000/v1/health")
 	suite.Nil(err)
 	suite.NotNil(resp)
 	suite.Equal(http.StatusNoContent, resp.StatusCode)
@@ -52,7 +52,7 @@ func (suite *ServerTestSuite) TestGetIndoorClimateData() {
 	server := suite.serverForTest()
 	suite.startServer(server)
 
-	resp, err := http.Get("http://localhost/v1/indoorclimate")
+	resp, err := http.Get("http://localhost:8000/v1/indoorclimate")
 	suite.Nil(err)
 	suite.NotNil(resp)
 	suite.Equal(http.StatusOK, resp.StatusCode)
