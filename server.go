@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	syslog "log"
 	"net/http"
 	"sync"
 	"time"
@@ -39,18 +40,21 @@ func (server *webServer) Run(ctx context.Context, waitGroup *sync.WaitGroup) err
 	}
 
 	server.logger.Infof("Listen [%s]", server.port)
+	syslog.Printf("Listen [%s]\n", server.port)
 	server.logger.Flush()
 	server.httpServer = &http.Server{Addr: ":" + server.port, Handler: router}
 
 	endChan := make(chan error, 1)
 	go func() {
 		endChan <- server.httpServer.ListenAndServe()
+		syslog.Println("Server stopped!")
 	}()
 
 	select {
 	case <-ctx.Done():
 		server.stopHttpServer()
 	case err := <-endChan:
+		syslog.Println("Stop reason: ", err)
 		return err
 	}
 	return nil

@@ -19,5 +19,5 @@ func (handler *HealthRequestHandler) handleHealthCheckRequest(w http.ResponseWri
 }
 
 func (handler *HealthRequestHandler) bootstrap(ctx context.Context, waitGroup *sync.WaitGroup) {
-	waitGroup.Done()
+	defer waitGroup.Done()
 }
