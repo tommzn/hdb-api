@@ -10,13 +10,13 @@ require (
 	github.com/tommzn/go-secrets v1.1.2
 	github.com/tommzn/hdb-core v1.0.3
 	github.com/tommzn/hdb-events-go v1.0.16
-	github.com/tommzn/hdb-message-client v1.3.0
+	github.com/tommzn/hdb-message-client v1.3.1
 	google.golang.org/protobuf v1.31.0
 )
 
 require (
 	github.com/aws/aws-lambda-go v1.41.0 // indirect
-	github.com/aws/aws-sdk-go v1.45.21 // indirect
+	github.com/aws/aws-sdk-go v1.45.22 // indirect
 	github.com/confluentinc/confluent-kafka-go/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
@@ -36,7 +36,7 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tommzn/go-metrics v1.0.1 // indirect
 	github.com/tommzn/go-utils v1.0.2 // indirect
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
