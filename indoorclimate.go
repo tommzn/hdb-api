@@ -16,7 +16,7 @@ import (
 
 // ApplyRoutes registers all methods sipported by this handler.
 func (handler *IndoorClimateRequestHandler) applyRoutes(router *mux.Router) {
-	router.HandleFunc("/api/v1/indoorclimate", handler.listIndoorClimate).Methods("GET")
+	router.HandleFunc("/v1/indoorclimate", handler.listIndoorClimate).Methods("GET")
 }
 
 // ListIndoorClimate returns list of availab inddor climate data records.
