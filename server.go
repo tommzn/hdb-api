@@ -14,7 +14,7 @@ import (
 
 // NewServer returns a new HTTP server.
 func newServer(conf config.Config, logger log.Logger, handlerList []RequestHandler) *webServer {
-	port := conf.Get("hdb.api.port", config.AsStringPtr("8080"))
+	port := conf.Get("hdb.api.port", config.AsStringPtr("80"))
 	return &webServer{
 		port:        *port,
 		conf:        conf,
