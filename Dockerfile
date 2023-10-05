@@ -30,7 +30,7 @@ LABEL org.opencontainers.image.source=https://github.com/tommzn/hdb-api
 WORKDIR /go
 
 COPY --from=builder /go/build/build_artifact_bin hdb-bin
-USER nonroot:nonroot
+#USER nonroot:nonroot
 
 EXPOSE 8000
 ENTRYPOINT ["/go/hdb-bin"]
