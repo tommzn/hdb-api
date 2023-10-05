@@ -28,7 +28,7 @@ func (handler *IndoorClimateRequestHandler) listIndoorClimate(w http.ResponseWri
 func (handler *IndoorClimateRequestHandler) bootstrap(ctx context.Context, waitGroup *sync.WaitGroup) {
 
 	waitGroup.Add(1)
-	handler.datasource.Run(ctx, waitGroup)
+	go handler.datasource.Run(ctx, waitGroup)
 	handler.mutex = &sync.Mutex{}
 
 	filter := []hdbcore.DataSource{hdbcore.DATASOURCE_INDOORCLIMATE}
